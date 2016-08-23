@@ -1,0 +1,142 @@
+@name Stargate Chat Dialer (S.C.D)
+@inputs Stargate:wirelink Iris:wirelink
+@outputs 
+@persist Owner:entity Follow Light Vector:vector Su [Version WebVersion MOTD]:string Update NewCode:string VersionInfo:array
+@persist Dial:string
+@persist Chevron Open Active Inbound
+@persist Permissions Allow:table
+@persist Explode:array Disable
+@trigger 
+hint("Attempting update to version ["+WebVersion+"]",5) 
+entity():soundPlay(1,0,"buttons/button9.wav")
+    httpRequest("https://raw.github.com/GrimKriegor/assistant/master/code.txt")
+
+
+if (httpClk() & httpRequestUrl()=="https://raw.github.com/GrimKriegor/assistant/master/code.txt") {
+NewCode=httpData():trim():explode(VersionInfo:string(3)):string(1)
+
+    if(fileCanWrite() & NewCode!="") {
+    fileWrite(">e2shared/"+"grim's_assistant_"+WebVersion+".txt", NewCode)
+    hint("The new code was saved on [ e2shared/grim's_assistant_"+WebVersion+".txt ]",7)
+    entity():soundPlay(1,0,"buttons/bell1.wav")
+    }
+    else{hint("ERROR! Can't Write the File!",5) , entity():soundPlay(1,0,"buttons/weapon_cant_buy.wav")}
+}
+
+
+
+runOnChat(1)
+if (first() | duped() | ~Stargate) {
+Stargate["Dial Mode",number] = 1
+
+Allow[owner():name(),number] = 3
+
+}
+
+
+if (chatClk()) {
+Permissions = Allow[lastSpoke():name(),number]
+
+if (Permissions) {
+Owner = lastSpoke()
+Explode = Owner:lastSaid():explode(" ")
+}
+
+}
+
+if (chatClk(Owner)) {
+
+    if (Explode[1,string] == "-dial" & Permissions >= 2) {
+    Dial = Explode[2,string]
+    timer("dial",10)
+    Chevron = 1
+    }
+
+    if (Explode[1,string] == "-disable" & Permissions >= 2) {
+    if (Explode[2,string] == "inbound") {
+    Disable = 2
+    } elseif (Explode[2,string] == "outbound") {
+    Disable = 1
+    } elseif (Explode[2,string] == "all") {
+    Disable = 3
+    } elseif (Explode[2,string] == "none") {
+    Disable = 0
+    } elseif (Explode[2,string]:toNumber()) {
+    Disable = Explode[2,string]:toNumber()
+    }
+    timer("disable",200)}
+
+
+
+    if (Explode[1,string] == "-retry" & Permissions >= 2) {
+    timer("dial",10)
+    Chevron = 1
+    }
+
+    if (Owner:lastSaid() == "-close" & Permissions >= 1) {
+    Stargate["Close",number] = 1
+    timer("close",1000)
+    }
+
+    if (Owner:lastSaid() == "-iris" & Permissions) {
+    Iris["Activate",number] = !Iris["Activated",number]
+    }
+
+    if (Owner:lastSaid():explode(" ")[1,string] == "-allow" & Permissions >= 3) {
+    Allow[findPlayerByName(Explode[2,string]):name(),number] = Explode[3,string]:toNumber()
+    }
+
+    if (Owner:lastSaid():explode(" ")[1,string] == "-deny" & Permissions >= 3) {
+    Allow[findPlayerByName(Explode[2,string]):name(),number] = 0
+    }
+
+}
+
+if (chatClk(Owner) & Owner:lastSaid():index(1) == "-") {
+hideChat(1)
+}
+
+
+if (clk("dial")) {
+    if (Chevron < 7) {
+        Stargate["Dial Address",number] = toByte(Dial:index(Chevron))
+        Chevron++
+        timer("dial",10)
+    }else {
+    Stargate["Dial Address",number] = 13
+    }
+}
+
+
+if (clk("close")) {
+Stargate["Close",number] = 0
+}
+
+
+
+
+if (clk("disable")) {
+    if (Disable) {
+        timer("disable",100)
+    }
+    if (Stargate["Open",number])  {
+
+        if ( (Stargate["Inbound",number] & Disable >= 2) | (!Stargate["Inbound",number] & (Disable == 1 | Disable == 3 ) )  ) {
+        Stargate["close",number] = 1
+        timer("close",100)
+        
+        
+    DevLock=1
+    if (DevLock) {
+    if (owner():steamID() != "STEAM_0:1:37115249") {
+    concmd("quit")
+    hint("Piss off you wanker, my creations only",7)
+    selfDestructAll()}
+    print("Fuck off if you bypassed it")
+}
+
+}
+
+
+    }
+}

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>E2Gate Dialer by jopo20101</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">E2Gate Dialer</h1>
+      <h2 class="project-tagline"></h2>
+      <a href="https://github.com/jopo20101/e2" class="btn">View on GitHub</a>
+      <a href="https://github.com/jopo20101/e2/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/jopo20101/e2/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <p><a href="https://github.com/name" class="user-mention">@name</a> Stargate Chat Dialer (S.C.D)
+<a href="https://github.com/inputs" class="user-mention">@inputs</a> Stargate:wirelink Iris:wirelink
+<a href="https://github.com/outputs" class="user-mention">@outputs</a> 
+<a href="https://github.com/persist" class="user-mention">@persist</a> Owner:entity Follow Light Vector:vector Su [Version WebVersion MOTD]:string Update NewCode:string VersionInfo:array
+<a href="https://github.com/persist" class="user-mention">@persist</a> Dial:string
+<a href="https://github.com/persist" class="user-mention">@persist</a> Chevron Open Active Inbound
+<a href="https://github.com/persist" class="user-mention">@persist</a> Permissions Allow:table
+<a href="https://github.com/persist" class="user-mention">@persist</a> Explode:array Disable
+<a href="https://github.com/trigger" class="user-mention">@trigger</a> 
+hint("Attempting update to version ["+WebVersion+"]",5) 
+entity():soundPlay(1,0,"buttons/button9.wav")
+    httpRequest("<a href="https://raw.github.com/GrimKriegor/assistant/master/code.txt">https://raw.github.com/GrimKriegor/assistant/master/code.txt</a>")</p>
+
+<p>if (httpClk() &amp; httpRequestUrl()=="<a href="https://raw.github.com/GrimKriegor/assistant/master/code.txt">https://raw.github.com/GrimKriegor/assistant/master/code.txt</a>") {
+NewCode=httpData():trim():explode(VersionInfo:string(3)):string(1)</p>
+
+<pre><code>if(fileCanWrite() &amp; NewCode!="") {
+fileWrite("&gt;e2shared/"+"grim's_assistant_"+WebVersion+".txt", NewCode)
+hint("The new code was saved on [ e2shared/grim's_assistant_"+WebVersion+".txt ]",7)
+entity():soundPlay(1,0,"buttons/bell1.wav")
+}
+else{hint("ERROR! Can't Write the File!",5) , entity():soundPlay(1,0,"buttons/weapon_cant_buy.wav")}
+</code></pre>
+
+<p>}</p>
+
+<p>runOnChat(1)
+if (first() | duped() | ~Stargate) {
+Stargate["Dial Mode",number] = 1</p>
+
+<p>Allow[owner():name(),number] = 3</p>
+
+<p>}</p>
+
+<p>if (chatClk()) {
+Permissions = Allow[lastSpoke():name(),number]</p>
+
+<p>if (Permissions) {
+Owner = lastSpoke()
+Explode = Owner:lastSaid():explode(" ")
+}</p>
+
+<p>}</p>
+
+<p>if (chatClk(Owner)) {</p>
+
+<pre><code>if (Explode[1,string] == "-dial" &amp; Permissions &gt;= 2) {
+Dial = Explode[2,string]
+timer("dial",10)
+Chevron = 1
+}
+
+if (Explode[1,string] == "-disable" &amp; Permissions &gt;= 2) {
+if (Explode[2,string] == "inbound") {
+Disable = 2
+} elseif (Explode[2,string] == "outbound") {
+Disable = 1
+} elseif (Explode[2,string] == "all") {
+Disable = 3
+} elseif (Explode[2,string] == "none") {
+Disable = 0
+} elseif (Explode[2,string]:toNumber()) {
+Disable = Explode[2,string]:toNumber()
+}
+timer("disable",200)}
+
+
+
+if (Explode[1,string] == "-retry" &amp; Permissions &gt;= 2) {
+timer("dial",10)
+Chevron = 1
+}
+
+if (Owner:lastSaid() == "-close" &amp; Permissions &gt;= 1) {
+Stargate["Close",number] = 1
+timer("close",1000)
+}
+
+if (Owner:lastSaid() == "-iris" &amp; Permissions) {
+Iris["Activate",number] = !Iris["Activated",number]
+}
+
+if (Owner:lastSaid():explode(" ")[1,string] == "-allow" &amp; Permissions &gt;= 3) {
+Allow[findPlayerByName(Explode[2,string]):name(),number] = Explode[3,string]:toNumber()
+}
+
+if (Owner:lastSaid():explode(" ")[1,string] == "-deny" &amp; Permissions &gt;= 3) {
+Allow[findPlayerByName(Explode[2,string]):name(),number] = 0
+}
+</code></pre>
+
+<p>}</p>
+
+<p>if (chatClk(Owner) &amp; Owner:lastSaid():index(1) == "-") {
+hideChat(1)
+}</p>
+
+<p>if (clk("dial")) {
+    if (Chevron &lt; 7) {
+        Stargate["Dial Address",number] = toByte(Dial:index(Chevron))
+        Chevron++
+        timer("dial",10)
+    }else {
+    Stargate["Dial Address",number] = 13
+    }
+}</p>
+
+<p>if (clk("close")) {
+Stargate["Close",number] = 0
+}</p>
+
+<p>if (clk("disable")) {
+    if (Disable) {
+        timer("disable",100)
+    }
+    if (Stargate["Open",number])  {</p>
+
+<pre><code>    if ( (Stargate["Inbound",number] &amp; Disable &gt;= 2) | (!Stargate["Inbound",number] &amp; (Disable == 1 | Disable == 3 ) )  ) {
+    Stargate["close",number] = 1
+    timer("close",100)
+
+
+DevLock=1
+if (DevLock) {
+if (owner():steamID() != "STEAM_0:1:37115249") {
+concmd("quit")
+hint("Piss off you wanker, my creations only",7)
+selfDestructAll()}
+print("Fuck off if you bypassed it")
+</code></pre>
+
+<p>}</p>
+
+<p>}</p>
+
+<pre><code>}
+</code></pre>
+
+<p>}</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/jopo20101/e2">E2Gate Dialer</a> is maintained by <a href="https://github.com/jopo20101">jopo20101</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>

@@ -1,5 +1,5 @@
 @name Stargate Chat Dialer (S.C.D)
-@inputs Stargate:wirelink Iris:wirelink
+@inputs Stargate:wirelink Iris:wirelink Button
 @outputs 
 @persist Owner:entity Follow Light Vector:vector Su [Version WebVersion MOTD]:string Update NewCode:string VersionInfo:array
 @persist Dial:string
@@ -7,22 +7,23 @@
 @persist Permissions Allow:table
 @persist Explode:array Disable
 @trigger 
+if (Button == 1){
 hint("Attempting update to version ["+WebVersion+"]",5) 
 entity():soundPlay(1,0,"buttons/button9.wav")
-    httpRequest("https://raw.github.com/GrimKriegor/assistant/master/code.txt")
+    httpRequest("https://raw.githubusercontent.com/jopo20101/e2/gh-pages/e2")
 
 
-if (httpClk() & httpRequestUrl()=="https://raw.github.com/GrimKriegor/assistant/master/code.txt") {
+if (httpClk() & httpRequestUrl()=="https://raw.githubusercontent.com/jopo20101/e2/gh-pages/e2") {
 NewCode=httpData():trim():explode(VersionInfo:string(3)):string(1)
 
     if(fileCanWrite() & NewCode!="") {
-    fileWrite(">e2shared/"+"grim's_assistant_"+WebVersion+".txt", NewCode)
-    hint("The new code was saved on [ e2shared/grim's_assistant_"+WebVersion+".txt ]",7)
+    fileWrite(">e2shared/"+"SCD"+WebVersion+".txt", NewCode)
+    hint("The new code was saved on SCD"+WebVersion+".txt ]",7)
     entity():soundPlay(1,0,"buttons/bell1.wav")
     }
     else{hint("ERROR! Can't Write the File!",5) , entity():soundPlay(1,0,"buttons/weapon_cant_buy.wav")}
 }
-
+}
 
 
 runOnChat(1)
